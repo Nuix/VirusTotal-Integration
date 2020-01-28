@@ -10,9 +10,9 @@ Dependencies:
 	Must have an Internet connection, and must supply your own VirusTotal API
 	key in the required variable.
 
-Author: Nuix CTAT
+Author: Nuix CTAT + Innovation Team
 
-Tested On: Nuix 6
+Tested On: Nuix 8.4
 """
 
 import urllib2
@@ -38,23 +38,37 @@ else:
 
 	allFiles = currentSelectedItems
 	total = len(allFiles)
+	print("Selected " + str(total) + " items")
 	discovered = 0
 	for item in allFiles:
 		parameters["resource"] = str(item.digests.md5)
 		data = urllib.urlencode(parameters)
-		req = urllib2.Request(url, data)
-		response = urllib2.urlopen(req)
-		raw = response.read()
-		json_data = json.loads(raw)
-
-		if json_data["response_code"] == 1:
-			discovered += 1
-			cm = item.getCustomMetadata()
-			cm.putInteger("VirusTotal Hits", json_data["positives"])
-			for scanner, res in json_data["scans"].iteritems():
-				cm.putText("VirusTotal " + scanner, res["result"])
-
+		try: 
+			req = urllib2.Request(url, data)
+			response = urllib2.urlopen(req)
+			raw = response.read()
+			json_data = json.loads(raw)
+			if json_data["response_code"] == 1:
+				discovered += 1
+				cm = item.getCustomMetadata()
+				cm.putInteger("VirusTotal Hits", json_data["positives"])
+				for scanner, res in json_data["scans"].iteritems():
+					cm.putText("VirusTotal " + scanner, res["result"])
+		except urllib2.HTTPError, e:
+			print('HTTPError = ' + str(e.code))
+			break;
+		except urllib2.URLError, e:
+			print('URLError = ' + str(e.reason))
+			break;
+		except httplib.HTTPException, e:
+			print('HTTPException')
+			break;
+		except Exception:
+			import traceback
+			print('generic exception: ' + traceback.format_exc())
+			break
 		time.sleep(sleep_time)
 
 	msg = "VirusTotal Search script has finished. %d / %d found." % (discovered, total)
+	print(msg)
 	jp.showMessageDialog(None, msg)
