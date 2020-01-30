@@ -30,31 +30,37 @@ discovered = 0
 errors = {}
 last_req = nil
 SLEEP_TIME = (60.0 / requests_per_minute).ceil
+# check API key is set
+API_KEY = CommonDialogs.getInput('API key:') if API_KEY == ''
 
 ProgressDialog.forBlock do |progress_dialog|
   progress_dialog.setTitle('VirusTotal Integration')
   progress_dialog.setLogVisible(true)
   progress_dialog.setTimestampLoggedMessages(true)
-  progress_dialog.setMainStatusAndLogIt("#{selected_count} items selected")
+  progress_dialog.logMessage("API Key: #{API_KEY}")
+  progress_dialog.setMainStatusAndLogIt("Retrieving file scan reports for #{selected_count} items from #{URL}")
   progress_dialog.setMainProgress(0, selected_count)
   $current_selected_items.each_with_index do |item, index|
     # wait between requests due to API limits
-    unless last_req.nil?
+    unless last_req.nil? || progress_dialog.abortWasRequested
       sleep_for = (SLEEP_TIME - (Time.now - last_req)).ceil
       if sleep_for.positive?
         progress_dialog.setSubStatusAndLogIt("Waiting #{SLEEP_TIME} seconds between requests")
         # update sub progress while sleeping
         progress_dialog.setSubProgress(0, sleep_for)
         sleep_for.times do |i|
+          break if progress_dialog.abortWasRequested
+
           sleep(1)
           progress_dialog.setSubProgress(i)
-          break if progress_dialog.abortWasRequested
         end
       end
     end
+    break if progress_dialog.abortWasRequested
+
     progress_dialog.setMainProgress(index)
     md5 = item.get_digests.get_md5
-    progress_dialog.setSubStatusAndLogIt("Retrieving file scan reports for #{md5}")
+    progress_dialog.setSubStatusAndLogIt("Requesting #{md5}")
     progress_dialog.setSubProgress(0)
     # get HTTP response
     uri = URI.parse(URL)
@@ -73,10 +79,11 @@ ProgressDialog.forBlock do |progress_dialog|
         scans = json_data['scans']
         progress_dialog.setSubProgress(0, scans.size)
         scans.each_with_index do |(scanner, res), i|
+          break if progress_dialog.abortWasRequested
+
           progress_dialog.setSubProgress(i)
           result = res['result']
           cm.putText("VirusTotal #{scanner}", result) unless result.nil?
-          break if progress_dialog.abortWasRequested
         end
       else # respource not found
         progress_dialog.logMessage(json_data['verbose_msg'])
@@ -96,7 +103,6 @@ ProgressDialog.forBlock do |progress_dialog|
       end
       progress_dialog.logMessage('ERROR ' + err)
     end
-    break if progress_dialog.abortWasRequested
   end
   if progress_dialog.abortWasRequested
     progress_dialog.setMainStatusAndLogIt('Completed: User Aborted')
