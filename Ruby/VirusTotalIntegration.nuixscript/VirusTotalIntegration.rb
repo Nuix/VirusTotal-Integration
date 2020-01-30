@@ -1,4 +1,4 @@
-# Menu Title: VirustTotal Integration
+# Menu Title: VirusTotal Integration
 # Needs Case: true
 # Needs Selected Items: true
 # @version 1.0.0
