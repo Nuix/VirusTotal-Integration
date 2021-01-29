@@ -14,19 +14,21 @@ For more details, refer to the [wiki](https://github.com/Nuix/VirusTotal-Integra
 **Note:** You must have an internet connection and must supply your own VirusTotal API key in the required variable.
 
 # Getting Started
-To run the script, you will require an active VirusTotal account and generate an API key, which you can get from [VirusTotal](http://www.virustotal.com). See the [wiki](https://github.com/Nuix/VirusTotal-Integration/wiki#virustotal-api-key) for further instructions.
+To run the script, you will require an active VirusTotal account and generate an API key, which you can get from [VirusTotal](http://www.virustotal.com). See the [wiki](https://github.com/Nuix/VirusTotal-Integration/wiki/VirusTotal-API-Key#requesting-a-new-api-key) for further instructions.
 ## Setup
 - Begin by downloading the latest release of this code [here](https://github.com/Nuix/VirusTotal-Integration/releases).
 - If you are running the standard script, extract the folder "VirusTotalIntegration.nuixscript" and its contents into your Nuix scripts directory. In Windows the script directory is likely going to be either of the following:
 
-%appdata%\Nuix\Scripts - User level script directory
-%programdata%\Nuix\Scripts - System level script directory
+```
+    %appdata%\Nuix\Scripts - User level script directory
+    %programdata%\Nuix\Scripts - System level script directory
+```
 
 - If you are running as a worker side script, you will just require the file [VirusTotalWSS.py](https://github.com/Nuix/VirusTotal-Integration/blob/wss/Python/WSS/VirusTotalWSS.py)
 
 - Each script will require you to edit it and enter the API key VirusTotal provided you at the relevant location. You can also adjust other options in the files as required.
 
-Full instructions to run each script is available on the [wiki](https://github.com/Nuix/VirusTotal-Integration/wiki)
+See [Standard script](https://github.com/Nuix/VirusTotal-Integration/wiki/Standard-Script#preparing-the-script) or [Worker side script](https://github.com/Nuix/VirusTotal-Integration/wiki/Worker-Side-Script#preparing-the-script) on the integration wiki for full details and troubleshooting.
 
 # License
 
